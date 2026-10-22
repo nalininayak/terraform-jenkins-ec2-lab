@@ -63,6 +63,17 @@ pipeline {
                         @echo off
                         setlocal
 
+                        echo Securing temporary SSH key...
+
+                        icacls "%SSH_KEY%" /inheritance:r
+                        if errorlevel 1 exit /b 1
+
+                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\%USERNAME%:R"
+                        if errorlevel 1 exit /b 1
+
+                        icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
+                        if errorlevel 1 exit /b 1
+
                         echo Installing Nginx on EC2...
 
                         ssh -o BatchMode=yes ^
