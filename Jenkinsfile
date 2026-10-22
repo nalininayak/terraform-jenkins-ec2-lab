@@ -129,20 +129,39 @@ pipeline {
                     )
                 ]) {
                     bat '''
-                    @echo off
-                    setlocal
+                        @echo off
+                        setlocal
 
-                    echo Testing SSH connectivity...
+                        echo Testing SSH connectivity...
+                        echo Applying secure ACL to temporary key...
 
-                    ssh -o BatchMode=yes ^
-                        -o ConnectTimeout=10 ^
-                        -o StrictHostKeyChecking=no ^
-                        -i "%SSH_KEY%" ^
-                        %SSH_USER%@3.108.63.81 "hostname"
+                        REM Disable inheritance and remove inherited ACEs
+                        icacls "%SSH_KEY%" /inheritance:r
+                        if errorlevel 1 exit /b 1
 
-                    if errorlevel 1 exit /b 1
+                        REM Remove access granted to broad user groups
+                        icacls "%SSH_KEY%" /remove:g *S-1-5-32-545 *S-1-5-11 *S-1-1-0
+                        if errorlevel 1 exit /b 1
 
-                    echo SSH test completed successfully.
+                        REM Grant read access to Local System
+                        icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
+                        if errorlevel 1 exit /b 1
+
+                        echo Verifying key ACL...
+                        icacls "%SSH_KEY%"
+                        if errorlevel 1 exit /b 1
+
+                        echo Testing SSH login...
+
+                        ssh -o BatchMode=yes ^
+                            -o ConnectTimeout=10 ^
+                            -o StrictHostKeyChecking=no ^
+                            -i "%SSH_KEY%" ^
+                            %SSH_USER%@3.108.63.81 "hostname"
+
+                        if errorlevel 1 exit /b 1
+
+                        echo SSH test completed successfully.
                     '''
                 }
             }
