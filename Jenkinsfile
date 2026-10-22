@@ -16,7 +16,7 @@ pipeline {
                         icacls "%SSH_KEY%" /inheritance:r
                         if errorlevel 1 exit /b 1
 
-                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\%USERNAME%:R"
+                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\\%USERNAME%:R"
                         if errorlevel 1 exit /b 1
 
                         icacls "%SSH_KEY%" /grant:r "SYSTEM:R"
@@ -45,7 +45,7 @@ pipeline {
                         icacls "%SSH_KEY%" /inheritance:r
                         if errorlevel 1 exit /b 1
 
-                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\%USERNAME%:R"
+                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\\%USERNAME%:R"
                         if errorlevel 1 exit /b 1
 
                         icacls "%SSH_KEY%" /grant:r "SYSTEM:R"
@@ -73,7 +73,7 @@ pipeline {
                         icacls "%SSH_KEY%" /inheritance:r
                         if errorlevel 1 exit /b 1
 
-                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\%USERNAME%:R"
+                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\\%USERNAME%:R"
                         if errorlevel 1 exit /b 1
 
                         icacls "%SSH_KEY%" /grant:r "SYSTEM:R"
