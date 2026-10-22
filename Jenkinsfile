@@ -61,7 +61,7 @@ pipeline {
                             -o StrictHostKeyChecking=no ^
                             -o ConnectTimeout=10 ^
                             -i "%SSH_KEY%" ^
-                            ubuntu@13.201.21.209 ^
+                            ubuntu@3.108.63.81 ^
                             "systemctl is-active nginx &&
                              curl -fsS http://127.0.0.1/ > /dev/null &&
                              echo NGINX_HTTP_HEALTHCHECK_OK"
