@@ -28,9 +28,9 @@ pipeline {
         stage('Install Nginx on EC2') {
             steps {
                 withCredentials([
-                    sshUserPrivateKey(
+                    file(
                         credentialsId: 'ec2-private-key',
-                        keyFileVariable: 'SSH_KEY'
+                        variable: 'SSH_KEY'
                     )
                 ]) {
                     bat '''
@@ -51,9 +51,9 @@ pipeline {
         stage('Validate Nginx') {
             steps {
                 withCredentials([
-                    sshUserPrivateKey(
+                    file(
                         credentialsId: 'ec2-private-key',
-                        keyFileVariable: 'SSH_KEY'
+                        variable: 'SSH_KEY'
                     )
                 ]) {
                     bat '''
