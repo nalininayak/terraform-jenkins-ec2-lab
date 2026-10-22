@@ -19,7 +19,7 @@ pipeline {
                         icacls "%SSH_KEY%" /inheritance:r
                         icacls "%SSH_KEY%" /grant:r "SYSTEM:R"
 
-                        ssh -o StrictHostKeyChecking=no -i "%SSH_KEY%" ubuntu@13.201.21.209 "hostname"
+                        ssh -o StrictHostKeyChecking=no -i "%SSH_KEY%" ubuntu@3.108.63.81 "hostname"
                     '''
                 }
             }
