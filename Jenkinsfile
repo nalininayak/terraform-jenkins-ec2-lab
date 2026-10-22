@@ -1,3 +1,120 @@
+// pipeline {
+//     agent any
+
+//     stages {
+//         stage('Test SSH to EC2') {
+//             steps {
+//                 withCredentials([
+//                     sshUserPrivateKey(
+//                         credentialsId: 'ec2-private-key-ssh',
+//                         keyFileVariable: 'SSH_KEY',
+//                         usernameVariable: 'SSH_USER'
+//                     )
+//                 ]) {
+//                     bat '''
+//                         @echo off
+//                         setlocal
+
+//                         echo Testing SSH connectivity...
+
+//                         icacls "%SSH_KEY%" /inheritance:r
+//                         if errorlevel 1 exit /b 1
+
+//                         icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\%USERNAME%:R"
+//                         if errorlevel 1 exit /b 1
+
+//                         icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
+//                         if errorlevel 1 exit /b 1
+
+//                         ssh -o BatchMode=yes ^
+//                             -o ConnectTimeout=10 ^
+//                             -o StrictHostKeyChecking=no ^
+//                             -i "%SSH_KEY%" ^
+//                             %SSH_USER%@3.108.63.81 "hostname"
+
+//                         if errorlevel 1 exit /b 1
+
+//                         echo SSH test completed successfully.
+//                     '''
+//                 }
+//             }
+//         }
+
+//         stage('Install Nginx on EC2') {
+//             steps {
+//                 withCredentials([
+//                     sshUserPrivateKey(
+//                         credentialsId: 'ec2-private-key-ssh',
+//                         keyFileVariable: 'SSH_KEY',
+//                         usernameVariable: 'SSH_USER'
+//                     )
+//                 ]) {
+//                     bat '''
+//                         @echo off
+//                         setlocal
+
+//                         icacls "%SSH_KEY%" /inheritance:r
+//                         if errorlevel 1 exit /b 1
+
+//                         icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\%USERNAME%:R"
+//                         if errorlevel 1 exit /b 1
+
+//                         icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
+//                         if errorlevel 1 exit /b 1
+
+//                         echo Installing Nginx on EC2...
+
+//                         ssh -o BatchMode=yes ^
+//                             -o StrictHostKeyChecking=no ^
+//                             -o ConnectTimeout=10 ^
+//                             -i "%SSH_KEY%" ^
+//                             %SSH_USER%@3.108.63.81 ^
+//                             "sudo apt-get update && sudo apt-get install -y nginx curl jq && sudo systemctl enable --now nginx && sudo systemctl is-active nginx"
+
+//                         if errorlevel 1 exit /b 1
+//                     '''
+//                 }
+//             }
+//         }
+
+//         stage('Validate Nginx') {
+//             steps {
+//                 withCredentials([
+//                     sshUserPrivateKey(
+//                         credentialsId: 'ec2-private-key-ssh',
+//                         keyFileVariable: 'SSH_KEY',
+//                         usernameVariable: 'SSH_USER'
+//                     )
+//                 ]) {
+//                     bat '''
+//                         @echo off
+//                         setlocal
+
+//                         icacls "%SSH_KEY%" /inheritance:r
+//                         if errorlevel 1 exit /b 1
+
+//                         icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\%USERNAME%:R"
+//                         if errorlevel 1 exit /b 1
+
+//                         icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
+//                         if errorlevel 1 exit /b 1
+
+//                         ssh -o BatchMode=yes ^
+//                             -o StrictHostKeyChecking=no ^
+//                             -o ConnectTimeout=10 ^
+//                             -i "%SSH_KEY%" ^
+//                             %SSH_USER%@3.108.63.81 ^
+//                             "systemctl is-active nginx && curl -fsS http://127.0.0.1/ > /dev/null && echo NGINX_HTTP_HEALTHCHECK_OK"
+
+//                         if errorlevel 1 exit /b 1
+//                     '''
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
 pipeline {
     agent any
 
@@ -12,103 +129,20 @@ pipeline {
                     )
                 ]) {
                     bat '''
-                        @echo off
-                        setlocal
+                    @echo off
+                    setlocal
 
-                        echo Testing SSH connectivity...
+                    echo Testing SSH connectivity...
 
-                        icacls "%SSH_KEY%" /inheritance:r
-                        if errorlevel 1 exit /b 1
+                    ssh -o BatchMode=yes ^
+                        -o ConnectTimeout=10 ^
+                        -o StrictHostKeyChecking=no ^
+                        -i "%SSH_KEY%" ^
+                        %SSH_USER%@3.108.63.81 "hostname"
 
-                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\\%USERNAME%:R"
-                        if errorlevel 1 exit /b 1
+                    if errorlevel 1 exit /b 1
 
-                        icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
-                        if errorlevel 1 exit /b 1
-
-                        ssh -o BatchMode=yes ^
-                            -o ConnectTimeout=10 ^
-                            -o StrictHostKeyChecking=no ^
-                            -i "%SSH_KEY%" ^
-                            %SSH_USER%@3.108.63.81 "hostname"
-
-                        if errorlevel 1 exit /b 1
-
-                        echo SSH test completed successfully.
-                    '''
-                }
-            }
-        }
-
-        stage('Install Nginx on EC2') {
-            steps {
-                withCredentials([
-                    sshUserPrivateKey(
-                        credentialsId: 'ec2-private-key-ssh',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
-                    )
-                ]) {
-                    bat '''
-                        @echo off
-                        setlocal
-
-                        echo Securing temporary SSH key...
-
-                        icacls "%SSH_KEY%" /inheritance:r
-                        if errorlevel 1 exit /b 1
-
-                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\\%USERNAME%:R"
-                        if errorlevel 1 exit /b 1
-
-                        icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
-                        if errorlevel 1 exit /b 1
-
-                        echo Installing Nginx on EC2...
-
-                        ssh -o BatchMode=yes ^
-                            -o StrictHostKeyChecking=no ^
-                            -o ConnectTimeout=10 ^
-                            -i "%SSH_KEY%" ^
-                            %SSH_USER%@3.108.63.81 ^
-                            "sudo apt-get update && sudo apt-get install -y nginx curl jq && sudo systemctl enable --now nginx && sudo systemctl is-active nginx"
-
-                        if errorlevel 1 exit /b 1
-                    '''
-                }
-            }
-        }
-
-        stage('Validate Nginx') {
-            steps {
-                withCredentials([
-                    sshUserPrivateKey(
-                        credentialsId: 'ec2-private-key-ssh',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
-                    )
-                ]) {
-                    bat '''
-                        @echo off
-                        setlocal
-
-                        icacls "%SSH_KEY%" /inheritance:r
-                        if errorlevel 1 exit /b 1
-
-                        icacls "%SSH_KEY%" /grant:r "%USERDOMAIN%\\%USERNAME%:R"
-                        if errorlevel 1 exit /b 1
-
-                        icacls "%SSH_KEY%" /grant:r "*S-1-5-18:(R)"
-                        if errorlevel 1 exit /b 1
-
-                        ssh -o BatchMode=yes ^
-                            -o StrictHostKeyChecking=no ^
-                            -o ConnectTimeout=10 ^
-                            -i "%SSH_KEY%" ^
-                            %SSH_USER%@3.108.63.81 ^
-                            "systemctl is-active nginx && curl -fsS http://127.0.0.1/ > /dev/null && echo NGINX_HTTP_HEALTHCHECK_OK"
-
-                        if errorlevel 1 exit /b 1
+                    echo SSH test completed successfully.
                     '''
                 }
             }
